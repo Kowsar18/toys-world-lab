@@ -8,17 +8,31 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch verified products
-$query = $conn->prepare("SELECT id,order_status ,user_id, total_price,payment_method FROM orders WHERE user_id = ?");
-$query->bind_param("i", $_SESSION['user_id']);
-$query->execute();
-$result = $query->get_result();
-$isVerified = $result->fetch_assoc();
 
-$order_id =  $isVerified['id']? $isVerified['id'] : 'Default Name';
-$order_status =$isVerified['order_status']? $isVerified['order_status'] : 'Default Name';
-$total_price = $isVerified['total_price']? $isVerified['total_price'] : 'Default Name';
-$payment_method = $isVerified['payment_method'] ? $isVerified['payment_method'] : 'Default Name';
+$user_id = $_SESSION['user_id'];
+
+// Fetch verified products
+// $query = $conn->prepare("SELECT id,order_status ,user_id, total_price,payment_method FROM orders WHERE user_id = ?");
+// $query->bind_param("i", $_SESSION['user_id']);
+// $query->execute();
+// $result = $query->get_result();
+// $isVerified = $result->fetch_assoc();
+
+
+
+
+$query = $conn->query("SELECT id,order_status ,user_id, total_price,payment_method FROM orders WHERE user_id = $user_id");
+// $result = $query->fetch_assoc();
+$isVerified = [];
+while ($row = $query->fetch_assoc()) {
+    $isVerified[] = $row;
+}
+
+
+// $order_id =  $isVerified['id']? $isVerified['id'] : 'Default Name';
+// $order_status =$isVerified['order_status']? $isVerified['order_status'] : 'Default Name';
+// $total_price = $isVerified['total_price']? $isVerified['total_price'] : 'Default Name';
+// $payment_method = $isVerified['payment_method'] ? $isVerified['payment_method'] : 'Default Name';
 
 
 // $name = property_exists($object->user, 'name') ? $object->user->name : 'Default Name';
@@ -100,52 +114,56 @@ $order_status
 $total_price
 $payment_method -->
 
-<div> 
-                <h3 style="font-size:2rem">Order Id:<?php echo htmlspecialchars($order_id); ?></h3>
+<div id="order_table"> 
+                <!-- <h3 style="font-size:2rem">Order Id:<?php echo htmlspecialchars($order_id); ?></h3>
                 <p style="margin:.5rem 0; font-size:1rem">Order status:<?php echo htmlspecialchars($order_status); ?></p>
                 <p style="margin:.5rem 0; font-size:1.25rem">Total Price: <?php echo $total_price; ?> Taka</p>
-                <strong style="font-size:1.5rem">Payment Method:<?php echo htmlspecialchars($payment_method); ?> </strong></div>
+                <strong style="font-size:1.5rem">Payment Method:<?php echo htmlspecialchars($payment_method); ?> </strong> -->
+            </div>
 
 
     <!-- Popup Overlay -->
     <div id="popup-overlay" class="popup-overlay"></div>
 
     <!-- Popup -->
-    <div id="popup" class="popup">
+    <!-- <div id="popup" class="popup">
         <p id="popup-message"></p>
         <button onclick="closePopup()">Close</button>
-    </div>
+    </div> -->
 
     <script>
         // Pass verified products from PHP to JavaScript
        
-        console.log(<?php echo json_encode($isVerified); ?>)
+      
 
-
-        const isVerified = <?php echo json_encode($isVerified); ?>;
+        const order_table=document.getElementById('order_table');
+      
+        const orders = <?php echo json_encode($isVerified); ?>;
+        console.log(orders)
      
-        const popUp=(status)=>{
+if(orders.length!==0){
+    for(order of orders){
+            new_order=document.createElement('div');
+            new_order.innerHTML=`
+             <h3 style="font-size:2rem">Order Id:${order.id?order.id:'N/A'}</h3>
+                <p style="margin:.5rem 0; font-size:1rem">Order status:${order.order_status?order.order_status:'N/A'}</p>
+                <p style="margin:.5rem 0; font-size:1.25rem">Total Price: ${order.total_price} Taka</p>
+                <strong style="font-size:1.5rem">Payment Method:${order.payment_method}</strong>
             
-            const popupMessage = document.getElementById('popup-message');
-            popupMessage.innerHTML = `Your order is <em>${status}</em>`;
-            
-            // Display popup
-            document.getElementById('popup-overlay').style.display = 'block';
-            document.getElementById('popup').style.display = 'block';
+            `
+                order_table.appendChild(new_order);
+                new_order.style.margin='2rem'
+                new_order.style.padding='1rem'
+                new_order.style.borderBottom='2px solid blue'
+                new_order.style.width='fit-content'
         }
+}
+else{
+    order_table.innerHTML="<h5 style='font-size:3rem;font-weight:bold;width:fit-content;margin:2rem auto 1rem;'>  No orders was done</h5>" 
+}
+       
 
-        // Show popup if there are verified products
-        if (isVerified.order_status) {
-            popUp(isVerified.order_status)
-        }
-        else{
-            popUp('Pending')
-        }
-        // Close popup
-        function closePopup() {
-            document.getElementById('popup-overlay').style.display = 'none';
-            document.getElementById('popup').style.display = 'none';
-        }
+
     </script>
 </body>
 </html>
