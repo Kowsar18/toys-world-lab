@@ -11,18 +11,9 @@ if ($conn->connect_error) {
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch verified products
-// $query = $conn->prepare("SELECT id,order_status ,user_id, total_price,payment_method FROM orders WHERE user_id = ?");
-// $query->bind_param("i", $_SESSION['user_id']);
-// $query->execute();
-// $result = $query->get_result();
-// $isVerified = $result->fetch_assoc();
-
-
 
 
 $query = $conn->query("SELECT id,order_status ,user_id, total_price,payment_method FROM orders WHERE user_id = $user_id");
-// $result = $query->fetch_assoc();
 $isVerified = [];
 while ($row = $query->fetch_assoc()) {
     $isVerified[] = $row;

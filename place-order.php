@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $conn->query("DELETE FROM cart WHERE user_id = $user_id");
 
     echo "Order placed successfully! Awaiting admin verification.";
-    header("Location: profile.php");
+    header("Location: user_dashboard.php");
     exit();
 }
 ?>
@@ -117,7 +117,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         style="resize:none;
                 width:100%;
                 height:200px;
-                border-radius:1rem"       
+                border-radius:1rem;
+                padding:1.5rem;
+                font-size:1rem;"
+
         name="address" required></textarea>
         <br>
         <label 
